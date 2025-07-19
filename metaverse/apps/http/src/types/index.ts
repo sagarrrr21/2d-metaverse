@@ -1,14 +1,14 @@
 import z from "zod";
 
 export const SignupSchema = z.object({
-  username: z.string().email(),
-  password: z.string().min(8),
+  username: z.string(),
+  password: z.string(),
   type: z.enum(["user", "admin"]),
 });
 
 export const SigninSchema = z.object({
-  usename: z.string().email(),
-  password: z.string().min(8),
+  username: z.string(),
+  password: z.string(),
 });
 
 export const UpdateMetadataSchema = z.object({
@@ -17,24 +17,27 @@ export const UpdateMetadataSchema = z.object({
 
 export const CreateSpaceSchema = z.object({
   name: z.string(),
-  dimension: z.string().regex(/^[0-9]{1,5}x[0-9]{1,5}$/),
-  mapId: z.string(),
+  dimensions: z.string().regex(/^[0-9]{1,4}x[0-9]{1,4}$/),
+  mapId: z.string().optional(),
+});
+
+export const DeleteElementSchema = z.object({
+  id: z.string(),
 });
 
 export const AddElementSchema = z.object({
-  name: z.string(),
+  spaceId: z.string(),
+  elementId: z.string(),
   x: z.number(),
   y: z.number(),
-  elementId: z.string(),
 });
 
 export const CreateElementSchema = z.object({
-  imaheUrl: z.string(),
+  imageUrl: z.string(),
   width: z.number(),
   height: z.number(),
   static: z.boolean(),
 });
-
 
 export const UpdateElementSchema = z.object({
   imageUrl: z.string(),
@@ -47,11 +50,22 @@ export const CreateAvatarSchema = z.object({
 
 export const CreateMapSchema = z.object({
   thumbnail: z.string(),
-  dimension: z.string().regex(/^[0-9]{1,4}x[0-9]{1,4}$/),
-  defaultElementId: z.array(z.object({
-    elementId: z.string(),
-    x: z.number(),
-    y: z.number(),
-  }))
+  dimensions: z.string().regex(/^[0-9]{1,4}x[0-9]{1,4}$/),
+  name: z.string(),
+  defaultElements: z.array(
+    z.object({
+      elementId: z.string(),
+      x: z.number(),
+      y: z.number(),
+    })
+  ),
 });
 
+declare global {
+  namespace Express {
+    export interface Request {
+      role?: "Admin" | "User";
+      userId?: string;
+    }
+  }
+}
